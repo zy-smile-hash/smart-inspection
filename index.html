@@ -753,7 +753,7 @@
       border-radius: 8px;
       overflow: hidden;
       position: relative;
-      height: 90px;
+      height: 75px;
     }
     
     .video-placeholder {
@@ -766,20 +766,67 @@
       font-size: 22px;
     }
     
+    .video-snapshots-wrapper {
+      position: relative;
+    }
+    
     .video-snapshots {
       display: flex;
       gap: 4px;
       margin-top: 6px;
       overflow-x: auto;
       padding-bottom: 2px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    .video-snapshots::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .slider-container {
+      padding: 4px 4px;
+      margin-top: 2px;
+    }
+    
+    .slider-container input[type="range"] {
+      width: 100%;
+      height: 2px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #ddd;
+      border-radius: 1px;
+      outline: none;
+    }
+    
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      background: #1a73e8;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 1px solid #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .slider-container input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      background: #1a73e8;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 1px solid #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
     
     .snapshot-item {
       flex-shrink: 0;
-      width: 48px;
-      height: 34px;
+      width: 42px;
+      height: 28px;
       background: #f5f5f5;
-      border-radius: 5px;
+      border-radius: 4px;
       position: relative;
       display: flex;
       align-items: center;
@@ -959,21 +1006,41 @@
       <div class="daily-video">
         <div class="video-placeholder">📹</div>
       </div>
-      <div class="video-snapshots">
-        <div class="snapshot-item" onclick="goToDaily()">
-          <div class="snapshot-time">15:30</div>
+      <div class="video-snapshots-wrapper">
+        <div class="video-snapshots" id="snapshotsContainer">
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">15:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">16:30</div>
+          </div>
+          <div class="snapshot-item active" onclick="goToDaily()">
+            <div class="snapshot-time">17:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">18:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">19:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">20:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">21:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">22:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">23:30</div>
+          </div>
+          <div class="snapshot-item" onclick="goToDaily()">
+            <div class="snapshot-time">00:30</div>
+          </div>
         </div>
-        <div class="snapshot-item" onclick="goToDaily()">
-          <div class="snapshot-time">16:30</div>
-        </div>
-        <div class="snapshot-item active" onclick="goToDaily()">
-          <div class="snapshot-time">17:30</div>
-        </div>
-        <div class="snapshot-item" onclick="goToDaily()">
-          <div class="snapshot-time">18:30</div>
-        </div>
-        <div class="snapshot-item" onclick="goToDaily()">
-          <div class="snapshot-time">19:30</div>
+        <div class="slider-container">
+          <input type="range" id="snapshotSlider" min="0" max="100" value="30" step="1">
         </div>
       </div>
     </div>
@@ -1084,6 +1151,24 @@
         selectCamera(cameraId);
       });
     });
+    
+    // 滑块与视频快照联动
+    const snapshotsContainer = document.getElementById('snapshotsContainer');
+    const snapshotSlider = document.getElementById('snapshotSlider');
+    
+    if (snapshotsContainer && snapshotSlider) {
+      snapshotSlider.addEventListener('input', function() {
+        const scrollPercent = this.value / 100;
+        const maxScroll = snapshotsContainer.scrollWidth - snapshotsContainer.clientWidth;
+        snapshotsContainer.scrollLeft = maxScroll * scrollPercent;
+      });
+      
+      snapshotsContainer.addEventListener('scroll', function() {
+        const maxScroll = this.scrollWidth - this.clientWidth;
+        const scrollPercent = maxScroll > 0 ? this.scrollLeft / maxScroll : 0;
+        snapshotSlider.value = scrollPercent * 100;
+      });
+    }
     
     // 查看详情按钮跳转
     document.getElementById('viewDetailBtn').addEventListener('click', () => {
