@@ -41,6 +41,7 @@
       border-radius: 32px;
       overflow: hidden;
       position: relative;
+      z-index: 1;
     }
     
     .phone-notch {
@@ -223,7 +224,7 @@
     
     /* 弹窗遮罩 */
     .modal-overlay {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;
@@ -390,7 +391,7 @@
     
     /* 扫码黑屏页面 */
     .scan-overlay {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;
@@ -551,7 +552,7 @@
     
     /* 错误提示弹窗 */
     .error-modal-overlay {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;
@@ -1008,57 +1009,57 @@
       </div>
     </div>
   </div>
-      </div>
-    </div>
-  
-  <!-- 错误提示弹窗 -->
-  <div class="error-modal-overlay" id="errorModal">
-    <div class="error-modal-content">
-      <div class="error-icon">✕</div>
-      <div class="error-message">您输入的SN码有误，请重新输入</div>
-      <button class="error-ok-btn" id="errorOkBtn">返回</button>
-    </div>
-  </div>
-  
-  <!-- 扫码黑屏页面 -->
-  <div class="scan-overlay" id="scanOverlay">
-    <div class="scan-close-btn" id="scanClose">×</div>
-    <div class="scan-frame">
-      <div class="scan-line"></div>
-    </div>
-    <div class="scan-hint-text">将二维码对准扫描框</div>
-  </div>
-  
-  <!-- 添加摄像机弹窗 -->
-  <div class="modal-overlay" id="addCameraModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title">添加摄像机</div>
-        <div class="modal-close" id="modalClose">×</div>
-      </div>
       
-      <div class="sn-input-section">
-        <label class="sn-label">设备SN码</label>
-        <div class="sn-input-wrapper">
-          <input type="text" class="sn-input" placeholder="请输入摄像机SN码">
-          <div class="scan-btn" id="scanBtn">📷</div>
+      <!-- 错误提示弹窗 -->
+      <div class="error-modal-overlay" id="errorModal">
+        <div class="error-modal-content">
+          <div class="error-icon">✕</div>
+          <div class="error-message">您输入的SN码有误，请重新输入</div>
+          <button class="error-ok-btn" id="errorOkBtn">返回</button>
         </div>
       </div>
       
-      <div class="scan-guide">
-        <div class="scan-guide-title">扫码指引</div>
-        <div class="scan-image"></div>
-        <div class="scan-hint">SN码通常位于摄像机底部或包装盒上</div>
+      <!-- 扫码黑屏页面 -->
+      <div class="scan-overlay" id="scanOverlay">
+        <div class="scan-close-btn" id="scanClose">×</div>
+        <div class="scan-frame">
+          <div class="scan-line"></div>
+        </div>
+        <div class="scan-hint-text">将二维码对准扫描框</div>
       </div>
       
-      <div class="rule-section">
-        <div class="rule-title">添加规则</div>
-        <div class="rule-content">• 每个账号最多允许添加5台摄像机<br>• 请确保输入的SN码正确无误<br>• 添加后可在硬件绑定列表中管理</div>
-      </div>
-      
-      <div class="modal-footer">
-        <button class="modal-btn cancel" id="cancelBtn">取消</button>
-        <button class="modal-btn confirm" id="confirmBtn">确认添加</button>
+      <!-- 添加摄像机弹窗 -->
+      <div class="modal-overlay" id="addCameraModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title">添加摄像机</div>
+            <div class="modal-close" id="modalClose">×</div>
+          </div>
+          
+          <div class="sn-input-section">
+            <label class="sn-label">设备SN码</label>
+            <div class="sn-input-wrapper">
+              <input type="text" class="sn-input" placeholder="请输入摄像机SN码">
+              <div class="scan-btn" id="scanBtn">📷</div>
+            </div>
+          </div>
+          
+          <div class="scan-guide">
+            <div class="scan-guide-title">扫码指引</div>
+            <div class="scan-image"></div>
+            <div class="scan-hint">SN码通常位于摄像机底部或包装盒上</div>
+          </div>
+          
+          <div class="rule-section">
+            <div class="rule-title">添加规则</div>
+            <div class="rule-content">• 每个账号最多允许添加5台摄像机<br>• 请确保输入的SN码正确无误<br>• 添加后可在硬件绑定列表中管理</div>
+          </div>
+          
+          <div class="modal-footer">
+            <button class="modal-btn cancel" id="cancelBtn">取消</button>
+            <button class="modal-btn confirm" id="confirmBtn">确认添加</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
