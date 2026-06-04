@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>每日动态</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f7fa;
+      min-height: 100vh;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .back-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    
+    .header-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    
+    /* 日期选择 */
+    .date-selector {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background-color: #fff;
+      margin-top: 12px;
+    }
+    
+    .date-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .date-item:hover {
+      background-color: #f5f7fa;
+    }
+    
+    .date-item.active {
+      background-color: #1a73e8;
+      color: #fff;
+    }
+    
+    .date-num {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .date-week {
+      font-size: 11px;
+    }
+    
+    .date-tag {
+      font-size: 9px;
+      background-color: rgba(255,255,255,0.3);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    
+    /* 实时画面 */
+    .live-section {
+      margin: 12px 20px;
+      background-color: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .live-image {
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      position: relative;
+    }
+    
+    .live-time {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .live-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: #ff4444;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* Tab切换 */
+    .tab-section {
+      margin: 12px 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 4px;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .tab.active {
+      background-color: #1a73e8;
+      color: #fff;
+    }
+    
+    .tab.inactive {
+      color: #999;
+    }
+    
+    /* 动态列表 */
+    .dynamic-list {
+      margin-top: 12px;
+    }
+    
+    .dynamic-item {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .dynamic-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    
+    .dynamic-time {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+    
+    .dynamic-content {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .warning-icon {
+      width: 32px;
+      height: 32px;
+      background-color: #fff3e0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    
+    .dynamic-text {
+      flex: 1;
+    }
+    
+    .dynamic-desc {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    
+    .dynamic-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    
+    .tag {
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    
+    .tag-purple {
+      background-color: #f3e5f5;
+      color: #7b1fa2;
+    }
+    
+    .tag-orange {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+    
+    .dynamic-image {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+      border-radius: 8px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .dynamic-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+    }
+    
+    .action-btn-sm {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .action-btn-sm:hover {
+      background-color: #f5f7fa;
+    }
+    
+    .action-btn-sm.active {
+      background-color: #e3f2fd;
+      border-color: #1a73e8;
+      color: #1a73e8;
+    }
+    
+    /* 安全提示 */
+    .safety-tip {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .tip-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .tip-icon {
+      width: 32px;
+      height: 32px;
+      background-color: #ffebee;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .tip-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .tip-content {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    /* 提示消息 */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- 头部 -->
+  <div class="header">
+    <div class="back-btn" id="backBtn">←</div>
+    <div class="header-title">每日动态</div>
+    <div class="header-actions">
+      <div class="action-btn">⋮</div>
+      <div class="action-btn" id="closeBtn">×</div>
+    </div>
+  </div>
+  
+  <!-- 日期选择 -->
+  <div class="date-selector">
+    <div class="date-item">
+      <span class="date-num">09</span>
+      <span class="date-week">周二</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">10</span>
+      <span class="date-week">周三</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">11</span>
+      <span class="date-week">周四</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">12</span>
+      <span class="date-week">周五</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">13</span>
+      <span class="date-week">周六</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">14</span>
+      <span class="date-week">周日</span>
+    </div>
+    <div class="date-item active">
+      <span class="date-num">15</span>
+      <span class="date-week">今天</span>
+      <span class="date-tag">今天</span>
+    </div>
+  </div>
+  
+  <!-- 实时画面 -->
+  <div class="live-section">
+    <div class="live-image">
+      <span>📹</span>
+      <div class="live-badge">● 实时</div>
+      <div class="live-time">2024-12-15 星期一 16:35:59</div>
+    </div>
+  </div>
+  
+  <!-- Tab切换 -->
+  <div class="tab-section">
+    <div class="tabs">
+      <div class="tab active" id="allTab">全部动态</div>
+      <div class="tab inactive" id="safetyTab">巡检安全提示</div>
+    </div>
+    
+    <!-- 全部动态列表 -->
+    <div class="dynamic-list" id="dynamicList">
+      <div class="dynamic-item">
+        <div class="dynamic-header">
+          <div class="dynamic-time">16:29</div>
+        </div>
+        <div class="dynamic-content">
+          <div class="warning-icon">⚠️</div>
+          <div class="dynamic-text">
+            <div class="dynamic-desc">屏幕显示人群密集，有宠物狗出现</div>
+            <div class="dynamic-tags">
+              <span class="tag tag-purple">宠物出现</span>
+              <span class="tag tag-orange">客流超限</span>
+            </div>
+          </div>
+        </div>
+        <div class="dynamic-actions">
+          <button class="action-btn-sm" id="accurate1">准确</button>
+          <button class="action-btn-sm" id="inaccurate1">不准确</button>
+        </div>
+      </div>
+      
+      <div class="dynamic-item">
+        <div class="dynamic-header">
+          <div class="dynamic-time">16:24</div>
+        </div>
+        <div class="dynamic-content">
+          <div class="warning-icon">⚠️</div>
+          <div class="dynamic-text">
+            <div class="dynamic-desc">屏幕显示人群密集，有宠物狗出现</div>
+            <div class="dynamic-tags">
+              <span class="tag tag-purple">宠物出现</span>
+              <span class="tag tag-orange">客流超限</span>
+            </div>
+          </div>
+          <div class="dynamic-image">📷</div>
+        </div>
+        <div class="dynamic-actions">
+          <button class="action-btn-sm" id="accurate2">准确</button>
+          <button class="action-btn-sm" id="inaccurate2">不准确</button>
+        </div>
+      </div>
+      
+      <div class="dynamic-item">
+        <div class="dynamic-header">
+          <div class="dynamic-time">16:19</div>
+        </div>
+        <div class="dynamic-content">
+          <div class="warning-icon">⚠️</div>
+          <div class="dynamic-text">
+            <div class="dynamic-desc">屏幕显示老鼠和宠物画面</div>
+            <div class="dynamic-tags">
+              <span class="tag tag-purple">宠物出现</span>
+              <span class="tag tag-orange">小猫咪</span>
+              <span class="tag tag-orange">老鼠</span>
+            </div>
+          </div>
+          <div class="dynamic-image">📷</div>
+        </div>
+        <div class="dynamic-actions">
+          <button class="action-btn-sm" id="accurate3">准确</button>
+          <button class="action-btn-sm" id="inaccurate3">不准确</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 巡检安全提示 -->
+    <div class="safety-list" id="safetyList" style="display: none;">
+      <div class="safety-tip">
+        <div class="tip-header">
+          <div class="tip-icon">🚨</div>
+          <div class="tip-title">巡检安全提示</div>
+        </div>
+        <div class="tip-content">
+          今日巡检发现以下安全隐患：
+          <ul style="margin-left: 20px; margin-top: 8px;">
+            <li>1. 监控画面显示区域存在人员聚集情况</li>
+            <li>2. 检测到非授权宠物进入监控区域</li>
+            <li>3. 部分时段客流超过预警阈值</li>
+          </ul>
+          <p style="margin-top: 12px;">请及时安排工作人员进行现场排查和处理。</p>
+        </div>
+      </div>
+      
+      <div class="safety-tip">
+        <div class="tip-header">
+          <div class="tip-icon">🛡️</div>
+          <div class="tip-title">安全建议</div>
+        </div>
+        <div class="tip-content">
+          根据今日巡检数据分析，建议：
+          <ul style="margin-left: 20px; margin-top: 8px;">
+            <li>1. 加强人员密集时段的现场管理</li>
+            <li>2. 检查并修复宠物进入通道</li>
+            <li>3. 考虑增加临时疏导措施</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 提示消息 -->
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    // 返回按钮
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.history.back();
+    });
+    
+    // 关闭按钮
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      window.close();
+    });
+    
+    // 日期选择
+    document.querySelectorAll('.date-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.date-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        showToast('已切换日期');
+      });
+    });
+    
+    // Tab切换
+    document.getElementById('allTab').addEventListener('click', () => {
+      document.getElementById('allTab').classList.add('active');
+      document.getElementById('safetyTab').classList.remove('active');
+      document.getElementById('safetyTab').classList.add('inactive');
+      document.getElementById('dynamicList').style.display = 'block';
+      document.getElementById('safetyList').style.display = 'none';
+    });
+    
+    document.getElementById('safetyTab').addEventListener('click', () => {
+      document.getElementById('safetyTab').classList.add('active');
+      document.getElementById('safetyTab').classList.remove('inactive');
+      document.getElementById('allTab').classList.remove('active');
+      document.getElementById('dynamicList').style.display = 'none';
+      document.getElementById('safetyList').style.display = 'block';
+    });
+    
+    // 准确/不准确按钮
+    document.querySelectorAll('.action-btn-sm').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        const otherBtn = btn.parentNode.querySelector('.action-btn-sm:not(.active)');
+        if (otherBtn) otherBtn.classList.remove('active');
+        showToast(btn.textContent + '已标记');
+      });
+    });
+    
+    // 显示提示消息
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

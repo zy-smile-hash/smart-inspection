@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>智能巡检</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(180deg, #1a73e8 0%, #ffffff 100%);
+      min-height: 100vh;
+    }
+    
+    .header {
+      padding: 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .header-title {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .container {
+      background: #ffffff;
+      border-radius: 20px 20px 0 0;
+      margin-top: -20px;
+      padding: 20px 16px;
+      padding-bottom: 100px;
+    }
+    
+    .section {
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .section-title .title-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: #1a73e8;
+      border-radius: 2px;
+    }
+    
+    /* 硬件绑定 */
+    .hardware-card {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .camera-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .camera-icon::after {
+      content: '';
+      width: 24px;
+      height: 20px;
+      border: 3px solid #fff;
+      border-radius: 4px;
+      position: relative;
+    }
+    
+    .camera-icon::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      margin-top: 24px;
+    }
+    
+    .camera-info {
+      flex: 1;
+    }
+    
+    .camera-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .camera-id {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .toggle-switch {
+      width: 48px;
+      height: 28px;
+      background: #ccc;
+      border-radius: 14px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .toggle-switch.on {
+      background: #1a73e8;
+    }
+    
+    .toggle-switch::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+    
+    .toggle-switch.on::after {
+      transform: translateX(20px);
+    }
+    
+    .camera-switch {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    
+    .camera-item {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      background: #f0f0f0;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+    }
+    
+    /* 弹窗遮罩 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* 弹窗内容 */
+    .modal-content {
+      background: #fff;
+      width: 100%;
+      max-height: 80vh;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 16px;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      transition: transform 0.3s;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .modal-overlay.show .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      background: #f0f0f0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #999;
+      cursor: pointer;
+    }
+    
+    .add-methods {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .add-method {
+      flex: 1;
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.3s;
+    }
+    
+    .add-method.active {
+      border-color: #1a73e8;
+      background: #e3f2fd;
+    }
+    
+    .method-icon {
+      width: 50px;
+      height: 50px;
+      background: #fff;
+      border-radius: 14px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .add-method.active .method-icon {
+      background: #1a73e8;
+    }
+    
+    .method-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .method-desc {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .sn-input-section {
+      margin-bottom: 24px;
+    }
+    
+    .sn-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 12px;
+      display: block;
+    }
+    
+    .sn-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .sn-input {
+      width: 100%;
+      padding: 14px 56px 14px 16px;
+      border: 2px solid #eee;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    .sn-input:focus {
+      border-color: #1a73e8;
+    }
+    
+    .scan-btn {
+      position: absolute;
+      right: 8px;
+      width: 40px;
+      height: 40px;
+      background: #f5f5f5;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      transition: background 0.3s;
+    }
+    
+    .scan-btn:hover {
+      background: #e0e0e0;
+    }
+    
+    /* 扫码黑屏页面 */
+    .scan-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #000;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .scan-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .scan-frame {
+      width: 240px;
+      height: 240px;
+      border: 3px solid #1a73e8;
+      border-radius: 16px;
+      position: relative;
+    }
+    
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #1a73e8;
+      animation: scanMove 2s linear infinite;
+    }
+    
+    @keyframes scanMove {
+      0% { top: 0; }
+      100% { top: calc(100% - 3px); }
+    }
+    
+    .scan-hint-text {
+      color: #fff;
+      font-size: 14px;
+      margin-top: 24px;
+    }
+    
+    .scan-close-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .scan-guide {
+      background: #fff3e0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .scan-guide-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e65100;
+      margin-bottom: 12px;
+    }
+    
+    .scan-image {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .scan-image::before {
+      content: 'SN码位置示意图';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #999;
+      font-size: 13px;
+      text-align: center;
+    }
+    
+    .scan-hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 12px;
+      text-align: center;
+    }
+    
+    .rule-section {
+      background: #e8f5e9;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .rule-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2e7d32;
+      margin-bottom: 8px;
+    }
+    
+    .rule-content {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .modal-btn.cancel {
+      background: #f0f0f0;
+      color: #666;
+    }
+    
+    .modal-btn.confirm {
+      background: #1a73e8;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    .modal-btn.confirm.disabled {
+      background: #ccc;
+      color: #999;
+      cursor: not-allowed;
+    }
+    
+    /* 错误提示弹窗 */
+    .error-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .error-modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .error-modal-content {
+      background: #fff;
+      width: 85%;
+      max-width: 320px;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+    
+    .error-modal-overlay.show .error-modal-content {
+      transform: scale(1);
+    }
+    
+    .error-icon {
+      width: 60px;
+      height: 60px;
+      background: #ffebee;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    
+    .error-message {
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    
+    .error-ok-btn {
+      width: 100%;
+      padding: 14px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .camera-item.active {
+      background: #1a73e8;
+      color: #fff;
+    }
+    
+    .camera-item.add {
+      border: 2px dashed #ccc;
+      background: transparent;
+      color: #999;
+    }
+    
+    /* 场景配置 */
+    .scene-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .scene-tab {
+      flex: 1;
+      padding: 10px 0;
+      text-align: center;
+      font-size: 14px;
+      color: #999;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    .scene-tab.active {
+      color: #1a73e8;
+      border-color: #1a73e8;
+    }
+    
+    .config-section {
+      margin-bottom: 20px;
+    }
+    
+    .config-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .tag {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .tag.green {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .tag.purple {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+    
+    .tag .icon {
+      width: 16px;
+      height: 16px;
+      background: rgba(0,0,0,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+    
+    .custom-input {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .custom-input input {
+      flex: 1;
+      padding: 10px 16px;
+      border: 2px solid #eee;
+      border-radius: 25px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+    
+    .custom-input input:focus {
+      border-color: #1a73e8;
+    }
+    
+    .custom-input button {
+      padding: 10px 20px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .custom-input button:disabled {
+      background: #ccc;
+      color: #999;
+      cursor: not-allowed;
+    }
+    
+    /* 每日动态 */
+    .daily-video {
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      height: 200px;
+    }
+    
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    
+    .video-time {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .video-snapshots {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    
+    .snapshot-item {
+      flex-shrink: 0;
+      width: 80px;
+      height: 60px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .snapshot-item::before {
+      content: '📹';
+      font-size: 20px;
+      opacity: 0.5;
+    }
+    
+    .snapshot-item.active {
+      border: 2px solid #1a73e8;
+    }
+    
+    .snapshot-time {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 2px 4px;
+      border-radius: 2px;
+      font-size: 10px;
+    }
+    
+    /* 巡检日志 */
+    .log-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .log-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .log-date {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .log-content {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .log-content .highlight {
+      color: #e53935;
+      font-weight: 500;
+    }
+    
+    .log-footer {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .log-tags {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .log-tag {
+      padding: 4px 10px;
+      background: #fff3e0;
+      color: #e65100;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+    
+    .view-detail {
+      font-size: 13px;
+      color: #1a73e8;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-title">智能巡检</div>
+  </div>
+  
+  <div class="container">
+    <!-- 硬件绑定 -->
+    <div class="section">
+      <div class="section-title" style="gap: 0;">
+        <div class="title-text" style="margin-left: 8px;">硬件绑定</div>
+        <div class="camera-item add" style="margin-left: auto;">+ 添加</div>
+      </div>
+      <div class="hardware-card" data-camera="1">
+        <div class="camera-icon"></div>
+        <div class="camera-info">
+          <div class="camera-name">高清500万像素AI摄像机</div>
+          <div class="camera-id">SN: 6003013213TYFY085085050</div>
+        </div>
+        <div class="toggle-switch on"></div>
+      </div>
+      <div class="hardware-card" data-camera="2">
+        <div class="camera-icon"></div>
+        <div class="camera-info">
+          <div class="camera-name">全景广角高清摄像机</div>
+          <div class="camera-id">SN: 8002014324ABCDEFGHIJKLMN</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+      <div class="hardware-card" data-camera="3">
+        <div class="camera-icon"></div>
+        <div class="camera-info">
+          <div class="camera-name">夜视红外智能摄像机</div>
+          <div class="camera-id">SN: 9001015435OPQRSTUVWXYZAB</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+    </div>
+    
+    <!-- 场景配置 -->
+    <div class="section">
+      <div class="section-title" style="gap: 0; justify-content: flex-start;">
+        <div class="title-text" style="margin-left: 8px;">场景配置</div>
+      </div>
+      <div class="scene-tabs">
+        <div class="scene-tab active">店铺</div>
+        <div class="scene-tab">水域</div>
+        <div class="scene-tab">仓库</div>
+      </div>
+      
+      <div class="config-section">
+        <div class="config-title">通用巡检配置</div>
+        <div class="tag-list">
+          <div class="tag green">
+            <span class="icon">人</span>
+            <span>人形</span>
+          </div>
+          <div class="tag green">
+            <span class="icon">滑</span>
+            <span>滑倒</span>
+          </div>
+          <div class="tag green">
+            <span class="icon">损</span>
+            <span>损坏商品</span>
+          </div>
+          <div class="tag green">
+            <span class="icon">争</span>
+            <span>争吵</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="config-section">
+        <div class="config-title">自定义巡检配置</div>
+        <div class="tag-list">
+          <div class="tag purple">
+            <span class="icon">耳</span>
+            <span>白色耳机</span>
+            <span class="remove-tag" style="font-size:10px; cursor: pointer;">×</span>
+          </div>
+        </div>
+        <div class="custom-input">
+          <input type="text" placeholder="只允许添加1个巡检项，字数控制在5个内" id="customItemInput">
+          <button>添加</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 每日动态 -->
+    <div class="section">
+      <div class="section-title" style="gap: 0; justify-content: flex-start;">
+        <div class="title-text" style="margin-left: 8px;">每日动态</div>
+      </div>
+      <div class="daily-video">
+        <div class="video-placeholder">📹</div>
+      </div>
+      <div class="video-snapshots">
+        <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-time">15:30</div>
+        </div>
+        <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-time">16:30</div>
+        </div>
+        <div class="snapshot-item active" onclick="goToDaily()">
+          <div class="snapshot-time">17:30</div>
+        </div>
+        <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-time">18:30</div>
+        </div>
+        <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-time">19:30</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 巡检日志 -->
+    <div class="section">
+      <div class="section-title" style="gap: 0; justify-content: flex-start;">
+        <div class="title-text" style="margin-left: 8px;">巡检日志</div>
+      </div>
+      <div class="log-card">
+        <div class="log-header">
+          <div class="log-title">智能巡检日报</div>
+          <div class="log-date">2024-03-27</div>
+        </div>
+        <div class="log-content">
+          在<span class="highlight">10:00-11:00</span>期间，店内多次出现<span class="highlight">火焰与烟雾</span>，存在<span class="highlight">严重积水</span>，且<span class="highlight">灭火器位置不规范</span>；部分员工未佩戴安全帽，存在抽烟现象，<span class="highlight">需立即整改</span>。
+        </div>
+        <div class="log-footer">
+          <div class="log-tags">
+            <div class="log-tag">消防安全</div>
+            <div class="log-tag">人员管理</div>
+          </div>
+          <div class="view-detail" id="viewDetailBtn">查看详情 ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 错误提示弹窗 -->
+  <div class="error-modal-overlay" id="errorModal">
+    <div class="error-modal-content">
+      <div class="error-icon">✕</div>
+      <div class="error-message">您输入的SN码有误，请重新输入</div>
+      <button class="error-ok-btn" id="errorOkBtn">返回</button>
+    </div>
+  </div>
+  
+  <!-- 扫码黑屏页面 -->
+  <div class="scan-overlay" id="scanOverlay">
+    <div class="scan-close-btn" id="scanClose">×</div>
+    <div class="scan-frame">
+      <div class="scan-line"></div>
+    </div>
+    <div class="scan-hint-text">将二维码对准扫描框</div>
+  </div>
+  
+  <!-- 添加摄像机弹窗 -->
+  <div class="modal-overlay" id="addCameraModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">添加摄像机</div>
+        <div class="modal-close" id="modalClose">×</div>
+      </div>
+      
+      <div class="sn-input-section">
+        <label class="sn-label">设备SN码</label>
+        <div class="sn-input-wrapper">
+          <input type="text" class="sn-input" placeholder="请输入摄像机SN码">
+          <div class="scan-btn" id="scanBtn">📷</div>
+        </div>
+      </div>
+      
+      <div class="scan-guide">
+        <div class="scan-guide-title">扫码指引</div>
+        <div class="scan-image"></div>
+        <div class="scan-hint">SN码通常位于摄像机底部或包装盒上</div>
+      </div>
+      
+      <div class="rule-section">
+        <div class="rule-title">添加规则</div>
+        <div class="rule-content">• 每个账号最多允许添加5台摄像机<br>• 请确保输入的SN码正确无误<br>• 添加后可在硬件绑定列表中管理</div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="modal-btn cancel" id="cancelBtn">取消</button>
+        <button class="modal-btn confirm" id="confirmBtn">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectCamera(cameraId) {
+      const allSwitches = document.querySelectorAll('.toggle-switch');
+      const allCards = document.querySelectorAll('.hardware-card');
+      
+      allSwitches.forEach((sw, index) => {
+        if (index + 1 === cameraId) {
+          sw.classList.add('on');
+        } else {
+          sw.classList.remove('on');
+        }
+      });
+      
+      allCards.forEach((card) => {
+        if (parseInt(card.dataset.camera) === cameraId) {
+          card.style.border = '2px solid #1a73e8';
+        } else {
+          card.style.border = 'none';
+        }
+      });
+    }
+
+    document.querySelectorAll('.toggle-switch').forEach((toggle, index) => {
+      toggle.addEventListener('click', () => {
+        const cameraId = index + 1;
+        selectCamera(cameraId);
+      });
+    });
+    
+    // 查看详情按钮跳转
+    document.getElementById('viewDetailBtn').addEventListener('click', () => {
+      window.location.href = 'detail.html';
+    });
+    
+    // 快照项跳转每日动态页面
+    function goToDaily() {
+      window.location.href = 'daily.html';
+    }
+    
+    // 场景配置tab切换
+    const sceneTabs = document.querySelectorAll('.scene-tab');
+    sceneTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        sceneTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+    
+    // 自定义检查项输入框
+    const customItemInput = document.getElementById('customItemInput');
+    const addCustomBtn = customItemInput.nextElementSibling;
+
+    function updateAddBtnState() {
+      const hasPurpleTag = document.querySelector('.tag.purple') !== null;
+      
+      if (hasPurpleTag) {
+        addCustomBtn.disabled = true;
+        return;
+      }
+      
+      const value = customItemInput.value.trim();
+      if (!value || value.length > 5) {
+        addCustomBtn.disabled = true;
+      } else {
+        addCustomBtn.disabled = false;
+      }
+    }
+
+    customItemInput.addEventListener('input', updateAddBtnState);
+    updateAddBtnState(); // 初始化按钮状态
+
+    // 点击添加按钮创建新标签
+    addCustomBtn.addEventListener('click', () => {
+      const value = customItemInput.value.trim();
+      if (!value || value.length > 5) return;
+
+      const tagList = document.querySelectorAll('.config-section .tag-list')[1];
+      const firstChar = value.charAt(0);
+      
+      const newTag = document.createElement('div');
+      newTag.className = 'tag purple';
+      newTag.innerHTML = `
+        <span class="icon">${firstChar}</span>
+        <span>${value}</span>
+        <span class="remove-tag" style="font-size:10px; cursor: pointer;">×</span>
+      `;
+
+      // 添加删除事件
+      newTag.querySelector('.remove-tag').addEventListener('click', (e) => {
+        e.stopPropagation();
+        newTag.remove();
+        updateAddBtnState();
+      });
+
+      // 插入到标签列表第一个位置
+      tagList.insertBefore(newTag, tagList.firstChild);
+      
+      // 清空输入框并更新按钮状态
+      customItemInput.value = '';
+      updateAddBtnState();
+    });
+
+    // 点击×删除标签
+    document.querySelectorAll('.remove-tag').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tag = btn.closest('.tag');
+        if (tag) {
+          tag.remove();
+          updateAddBtnState(); // 删除标签后更新按钮状态
+        }
+      });
+    });
+
+    // 添加摄像机弹窗交互
+    const addBtn = document.querySelector('.camera-item.add');
+    const modal = document.getElementById('addCameraModal');
+    const modalClose = document.getElementById('modalClose');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    // 扫码相关
+    const scanBtn = document.getElementById('scanBtn');
+    const scanOverlay = document.getElementById('scanOverlay');
+    const scanClose = document.getElementById('scanClose');
+    
+    function openScan() {
+      scanOverlay.classList.add('show');
+    }
+    
+    function closeScan() {
+      scanOverlay.classList.remove('show');
+    }
+    
+    scanBtn.addEventListener('click', openScan);
+    scanClose.addEventListener('click', closeScan);
+    
+    function openModal() {
+      modal.classList.add('show');
+    }
+    
+    function closeModal() {
+      modal.classList.remove('show');
+    }
+    
+    addBtn.addEventListener('click', openModal);
+    modalClose.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    
+    // 点击遮罩关闭弹窗
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+    
+    // SN码校验：首页摄像机SN码位数为22位（如 SN: 6003013213TYFY085085050）
+    const REQUIRED_SN_LENGTH = 22;
+    
+    // 校验SN码位数并更新按钮状态
+    function validateSNCode() {
+      const snInput = document.querySelector('.sn-input');
+      const snCode = snInput.value.trim();
+      
+      if (snCode.length === REQUIRED_SN_LENGTH) {
+        confirmBtn.classList.remove('disabled');
+      } else {
+        confirmBtn.classList.add('disabled');
+      }
+    }
+    
+    // 监听输入变化
+    const snInput = document.querySelector('.sn-input');
+    snInput.addEventListener('input', validateSNCode);
+    snInput.addEventListener('change', validateSNCode);
+    
+    // 初始化按钮状态
+    validateSNCode();
+    
+    // 错误提示弹窗
+    const errorModal = document.getElementById('errorModal');
+    const errorOkBtn = document.getElementById('errorOkBtn');
+    
+    function showErrorModal() {
+      errorModal.classList.add('show');
+    }
+    
+    function closeErrorModal() {
+      errorModal.classList.remove('show');
+    }
+    
+    errorOkBtn.addEventListener('click', closeErrorModal);
+    
+    // 确认添加
+    confirmBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // 如果按钮处于禁用状态，直接返回
+      if (confirmBtn.classList.contains('disabled')) {
+        return;
+      }
+      
+      // 当前不考虑输入正确的添加场景，直接显示错误提示
+      showErrorModal();
+    });
+  </script>
+</body>
+</html>

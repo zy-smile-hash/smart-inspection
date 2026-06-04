@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>报告详情</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f7fa;
+      min-height: 100vh;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #333;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    
+    .header-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    /* 日期选择 */
+    .date-selector {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background-color: #fff;
+      margin-top: 12px;
+    }
+    
+    .date-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .date-item:hover {
+      background-color: #f5f7fa;
+    }
+    
+    .date-item.active {
+      background-color: #1a73e8;
+      color: #fff;
+    }
+    
+    .date-num {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .date-week {
+      font-size: 12px;
+    }
+    
+    .date-tag {
+      font-size: 10px;
+      background-color: rgba(255,255,255,0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    /* 内容卡片 */
+    .content-card {
+      margin: 12px 20px;
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .card-actions {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #999;
+      font-size: 14px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    
+    .action-item:hover {
+      color: #1a73e8;
+    }
+    
+    .action-item.active {
+      color: #1a73e8;
+    }
+    
+    /* 当日总结 */
+    .summary-content {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      text-indent: 2em;
+    }
+    
+    /* 当日关注 */
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 16px;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .tag {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+    }
+    
+    .tag-purple {
+      background-color: #e8e4f4;
+      color: #6b4cbc;
+    }
+    
+    .tag-red {
+      background-color: #ffeaea;
+      color: #d32f2f;
+    }
+    
+    .tag-orange {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+    
+    .tag-green {
+      background-color: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    /* 成功提示 */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- 头部 -->
+  <div class="header">
+    <div class="back-btn" id="backBtn">
+      <span>←</span>
+      <span>返回</span>
+    </div>
+    <div class="header-title">报告详情</div>
+    <div class="header-actions">
+      <div class="action-btn">⋮</div>
+      <div class="action-btn" id="closeBtn">×</div>
+    </div>
+  </div>
+  
+  <!-- 日期选择 -->
+  <div class="date-selector">
+    <div class="date-item">
+      <span class="date-num">18</span>
+      <span class="date-week">周一</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">19</span>
+      <span class="date-week">周二</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">20</span>
+      <span class="date-week">周三</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">21</span>
+      <span class="date-week">周四</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">22</span>
+      <span class="date-week">周五</span>
+    </div>
+    <div class="date-item">
+      <span class="date-num">23</span>
+      <span class="date-week">周六</span>
+    </div>
+    <div class="date-item active">
+      <span class="date-num">24</span>
+      <span class="date-week">今日</span>
+      <span class="date-tag">今日</span>
+    </div>
+  </div>
+  
+  <!-- 当日总结 -->
+  <div class="content-card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="card-icon" style="background-color: #e3f2fd;">💬</div>
+        <span>当日总结</span>
+      </div>
+      <div class="card-actions">
+        <div class="action-item" id="likeBtn">
+          <span>👍</span>
+          <span>点赞</span>
+        </div>
+        <div class="action-item" id="dislikeBtn">
+          <span>👎</span>
+          <span>倒赞</span>
+        </div>
+        <div class="action-item" id="copyBtn">
+          <span>📋</span>
+          <span>复制</span>
+        </div>
+      </div>
+    </div>
+    <div class="summary-content" id="summaryContent">
+      巡检时间段01:30-02:00，仅讨论了红色救生圈的摆放与用途，未发现消防安全、卫生环境及人员行为方面的问题或异常情况。
+    </div>
+  </div>
+  
+  <!-- 当日关注 -->
+  <div class="content-card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="card-icon" style="background-color: #f3e5f5;">💜</div>
+        <span>当日关注</span>
+      </div>
+    </div>
+    
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-value">208</div>
+        <div class="stat-label">今日巡检次数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">10</div>
+        <div class="stat-label">目标及事件数</div>
+      </div>
+    </div>
+    
+    <div class="tags-container">
+      <div class="tag tag-purple">用户定义检测项 12</div>
+      <div class="tag tag-purple">默认在最前面 8</div>
+      <div class="tag tag-red">危险标签 6</div>
+      <div class="tag tag-orange">火焰 2</div>
+      <div class="tag tag-orange">异常标签 76</div>
+      <div class="tag tag-orange">积水 36</div>
+      <div class="tag tag-orange">垃圾 16</div>
+      <div class="tag tag-green">普通标签 16</div>
+      <div class="tag tag-green">树木 10</div>
+      <div class="tag tag-green">建筑 8</div>
+    </div>
+  </div>
+  
+  <!-- 提示消息 -->
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    // 返回按钮
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.history.back();
+    });
+    
+    // 关闭按钮
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      window.close();
+    });
+    
+    // 日期选择
+    document.querySelectorAll('.date-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.date-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        showToast('已切换到所选日期');
+      });
+    });
+    
+    // 点赞按钮
+    const likeBtn = document.getElementById('likeBtn');
+    likeBtn.addEventListener('click', () => {
+      likeBtn.classList.toggle('active');
+      if (likeBtn.classList.contains('active')) {
+        showToast('点赞成功');
+      } else {
+        showToast('已取消点赞');
+      }
+    });
+    
+    // 倒赞按钮
+    const dislikeBtn = document.getElementById('dislikeBtn');
+    dislikeBtn.addEventListener('click', () => {
+      dislikeBtn.classList.toggle('active');
+      if (dislikeBtn.classList.contains('active')) {
+        showToast('已标记不满意');
+      } else {
+        showToast('已取消标记');
+      }
+    });
+    
+    // 复制按钮
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const content = document.getElementById('summaryContent').textContent;
+      try {
+        await navigator.clipboard.writeText(content);
+        showToast('复制成功');
+      } catch (err) {
+        // 降级方案
+        const textarea = document.createElement('textarea');
+        textarea.value = content;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('复制成功');
+      }
+    });
+    
+    // 显示提示消息
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
