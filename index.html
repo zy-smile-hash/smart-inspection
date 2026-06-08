@@ -13,63 +13,33 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #e0e5ec 0%, #c8d0e0 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
     }
     
-    .phone-container {
-      width: 375px;
-      height: 812px;
-      background: #000;
-      border-radius: 40px;
-      padding: 6px;
-      box-shadow: 
-        0 0 0 1px rgba(0,0,0,0.8),
-        0 20px 40px -10px rgba(0, 0, 0, 0.3);
-      position: relative;
+    .page-container {
+      width: 402px;
+      height: 874px;
+      background: #ffffff;
+      margin: 0 auto;
       overflow: hidden;
+      position: relative;
     }
     
-    .phone-screen {
+    .page-content {
       width: 100%;
       height: 100%;
-      background: #ffffff;
-      border-radius: 32px;
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
-    
-    .phone-notch {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 160px;
-      height: 20px;
-      background: #000;
-      border-radius: 0 0 12px 12px;
-      z-index: 100;
-    }
-    
-    .phone-top-bar {
-      height: 44px;
-      background: #1a73e8;
-      padding-top: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
+
     .header {
-      padding: 20px 16px;
+      padding: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      background: #1a73e8;
     }
     
     .header-title {
@@ -212,6 +182,18 @@
     
     .toggle-switch.on::after {
       transform: translateX(16px);
+    }
+    
+    .unbind-btn {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 10px;
+      color: #e53935;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .unbind-btn:active {
+      opacity: 0.7;
     }
     
     .camera-switch {
@@ -635,9 +617,17 @@
     }
     
     .camera-item.add {
-      border: 2px dashed #ccc;
+      border: 1.5px dashed #ccc;
       background: transparent;
       color: #999;
+      padding: 3px 10px;
+      font-size: 11px;
+      border-radius: 14px;
+    }
+    .camera-item.add.disabled {
+      color: #bbb;
+      border-color: #ddd;
+      pointer-events: none;
     }
     
     /* 场景配置 */
@@ -753,7 +743,8 @@
       border-radius: 8px;
       overflow: hidden;
       position: relative;
-      height: 75px;
+      aspect-ratio: 7 / 3;
+      width: 100%;
     }
     
     .video-placeholder {
@@ -784,58 +775,47 @@
       display: none;
     }
     
-    .slider-container {
-      padding: 4px 4px;
-      margin-top: 2px;
-    }
-    
-    .slider-container input[type="range"] {
-      width: 100%;
-      height: 2px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: #ddd;
-      border-radius: 1px;
-      outline: none;
-    }
-    
-    .slider-container input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      background: #1a73e8;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 1px solid #fff;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
-    
-    .slider-container input[type="range"]::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      background: #1a73e8;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 1px solid #fff;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
     
     .snapshot-item {
       flex-shrink: 0;
-      width: 42px;
-      height: 28px;
+      width: 80px;
+      height: 50px;
       background: #f5f5f5;
       border-radius: 4px;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .snapshot-item:active {
+      transform: scale(0.95);
     }
     .snapshot-item::before {
       content: '📹';
-      font-size: 12px;
+      font-size: 20px;
       opacity: 0.5;
+    }
+    .snapshot-item .play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 28px;
+      background: rgba(26, 115, 232, 0.85);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      z-index: 2;
+    }
+    .snapshot-item .play-icon::after {
+      content: '▶';
+      margin-left: 2px;
     }
     
     .snapshot-item.active {
@@ -848,11 +828,76 @@
       left: 2px;
       background: rgba(0,0,0,0.7);
       color: #fff;
-      padding: 1px 3px;
+      font-size: 9px;
+      padding: 2px 4px;
       border-radius: 2px;
-      font-size: 7px;
+      z-index: 2;
     }
     
+    .snapshot-hint {
+      font-size: 9px;
+      color: #999;
+      text-align: center;
+      margin-top: 4px;
+      padding: 4px 0;
+    }
+
+    .video-popup-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+    .video-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .video-popup {
+      width: 90%;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+    .video-popup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #222;
+      color: #fff;
+      font-size: 13px;
+    }
+    .video-popup-close {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .video-popup-body {
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #2a2a2a, #4a4a4a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.8);
+      font-size: 48px;
+    }
     /* 巡检日志 */
     .log-card {
       background: #fff;
@@ -914,12 +959,17 @@
       font-size: 11px;
       color: #1a73e8;
     }
+    
+    .view-detail-btn {
+      font-size: 11px;
+      color: #1a73e8;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div class="phone-container">
-    <div class="phone-screen">
-      <div class="phone-notch"></div>
+  <div class="page-container">
+    <div class="page-content">
       <div class="header">
         <div class="header-title">智能巡检</div>
       </div>
@@ -928,14 +978,15 @@
     <!-- 硬件绑定 -->
     <div class="section">
       <div class="section-title" style="gap: 0;">
-        <div class="title-text" style="margin-left: 8px;">硬件绑定</div>
-        <div class="camera-item add" style="margin-left: auto;">+ 添加</div>
+        <div class="title-text" style="margin-left: 8px;">设备绑定</div>
+        <div class="camera-item add" id="addCameraBtn" style="margin-left: auto;">+ 添加</div>
       </div>
       <div class="hardware-card" data-camera="1">
         <div class="camera-icon"></div>
         <div class="camera-info">
           <div class="camera-name">高清500万像素AI摄像机</div>
           <div class="camera-id">SN: 6003013213TYFY085085050</div>
+          <div class="unbind-btn">解绑设备</div>
         </div>
         <div class="toggle-switch on"></div>
       </div>
@@ -944,104 +995,111 @@
         <div class="camera-info">
           <div class="camera-name">全景广角高清摄像机</div>
           <div class="camera-id">SN: 8002014324ABCDEFGHIJKLMN</div>
+          <div class="unbind-btn">解绑设备</div>
         </div>
         <div class="toggle-switch"></div>
       </div>
-    </div>
+      <div class="hardware-card" data-camera="3">
+        <div class="camera-icon"></div>
+        <div class="camera-info">
+          <div class="camera-name">夜视红外智能摄像机</div>
+          <div class="camera-id">SN: 9003025435OPQRSTUVWXYZAB</div>
+          <div class="unbind-btn">解绑设备</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
     
     <!-- 场景配置 -->
     <div class="section">
-      <div class="section-title" style="gap: 0; justify-content: flex-start;">
+      <div class="section-title" style="gap: 0;">
         <div class="title-text" style="margin-left: 8px;">场景配置</div>
-      </div>
-      <div class="scene-tabs">
-        <div class="scene-tab active">店铺</div>
-        <div class="scene-tab">水域</div>
-        <div class="scene-tab">仓库</div>
+        <div class="view-detail-btn" id="sceneViewDetailBtn" style="margin-left: auto; margin-right: 8px;">通用场景 ›</div>
       </div>
       
-      <div class="config-section">
-        <div class="config-title">通用巡检配置</div>
-        <div class="tag-list">
-          <div class="tag green">
-            <span class="icon">人</span>
-            <span>人形</span>
-          </div>
-          <div class="tag green">
-            <span class="icon">滑</span>
-            <span>滑倒</span>
-          </div>
-          <div class="tag green">
-            <span class="icon">损</span>
-            <span>损坏商品</span>
-          </div>
-          <div class="tag green">
-            <span class="icon">争</span>
-            <span>争吵</span>
-          </div>
+      <div class="tag-list">
+        <div class="tag green">
+          <span class="icon">人</span>
+          <span>人形</span>
         </div>
-      </div>
-      
-      <div class="config-section">
-        <div class="config-title">自定义巡检配置</div>
-        <div class="tag-list">
-          <div class="tag purple">
-            <span class="icon">耳</span>
-            <span>白色耳机</span>
-            <span class="remove-tag" style="font-size:10px; cursor: pointer;">×</span>
-          </div>
+        <div class="tag green">
+          <span class="icon">滑</span>
+          <span>滑倒</span>
         </div>
-        <div class="custom-input">
-          <input type="text" placeholder="只允许添加1个巡检项，字数控制在5个内" id="customItemInput">
-          <button>添加</button>
+        <div class="tag green">
+          <span class="icon">损</span>
+          <span>损坏商品</span>
+        </div>
+        <div class="tag green">
+          <span class="icon">争</span>
+          <span>争吵</span>
         </div>
       </div>
     </div>
     
     <!-- 每日动态 -->
     <div class="section">
-      <div class="section-title" style="gap: 0; justify-content: flex-start;">
+      <div class="section-title" style="gap: 0;">
         <div class="title-text" style="margin-left: 8px;">每日动态</div>
+        <div class="view-detail-btn" id="dailyViewDetailBtn" style="margin-left: auto; margin-right: 8px;">查看详情 ›</div>
       </div>
       <div class="daily-video">
         <div class="video-placeholder">📹</div>
       </div>
+      <div class="snapshot-hint">← 左右滑动查看更多 · 点击缩略图预览视频 →</div>
       <div class="video-snapshots-wrapper">
         <div class="video-snapshots" id="snapshotsContainer">
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="15:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">15:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="16:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">16:30</div>
           </div>
-          <div class="snapshot-item active" onclick="goToDaily()">
+          <div class="snapshot-item active" data-time="17:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">17:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="18:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">18:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="19:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">19:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="20:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">20:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="21:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">21:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="22:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">22:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="23:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">23:30</div>
           </div>
-          <div class="snapshot-item" onclick="goToDaily()">
+          <div class="snapshot-item" data-time="00:30">
+            <div class="play-icon"></div>
             <div class="snapshot-time">00:30</div>
           </div>
         </div>
-        <div class="slider-container">
-          <input type="range" id="snapshotSlider" min="0" max="100" value="30" step="1">
+      </div>
+    </div>
+    
+    <!-- 视频播放弹窗 -->
+    <div class="video-popup-overlay" id="videoPopupOverlay">
+      <div class="video-popup">
+        <div class="video-popup-header">
+          <div id="videoPopupTitle">17:30 视频预览</div>
+          <div class="video-popup-close" id="videoPopupClose">×</div>
         </div>
+        <div class="video-popup-body">▶️</div>
       </div>
     </div>
     
@@ -1111,7 +1169,7 @@
           
           <div class="rule-section">
             <div class="rule-title">添加规则</div>
-            <div class="rule-content">• 每个账号最多允许添加5台摄像机<br>• 请确保输入的SN码正确无误<br>• 添加后可在硬件绑定列表中管理</div>
+            <div class="rule-content">• 每个账号最多允许添加3台摄像机<br>• 请确保输入的SN码正确无误</div>
           </div>
           
           <div class="modal-footer">
@@ -1152,32 +1210,62 @@
       });
     });
     
-    // 滑块与视频快照联动
-    const snapshotsContainer = document.getElementById('snapshotsContainer');
-    const snapshotSlider = document.getElementById('snapshotSlider');
-    
-    if (snapshotsContainer && snapshotSlider) {
-      snapshotSlider.addEventListener('input', function() {
-        const scrollPercent = this.value / 100;
-        const maxScroll = snapshotsContainer.scrollWidth - snapshotsContainer.clientWidth;
-        snapshotsContainer.scrollLeft = maxScroll * scrollPercent;
+    document.querySelectorAll('.unbind-btn').forEach((btn, index) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.hardware-card');
+        card.remove();
+        const remainingSwitches = document.querySelectorAll('.toggle-switch');
+        if (remainingSwitches.length > 0 && !document.querySelector('.toggle-switch.on')) {
+          remainingSwitches[0].classList.add('on');
+        }
       });
-      
-      snapshotsContainer.addEventListener('scroll', function() {
-        const maxScroll = this.scrollWidth - this.clientWidth;
-        const scrollPercent = maxScroll > 0 ? this.scrollLeft / maxScroll : 0;
-        snapshotSlider.value = scrollPercent * 100;
-      });
-    }
+    });
     
     // 查看详情按钮跳转
     document.getElementById('viewDetailBtn').addEventListener('click', () => {
       window.location.href = 'detail.html';
     });
     
-    // 快照项跳转每日动态页面
     function goToDaily() {
       window.location.href = 'daily.html';
+    }
+    
+    const snapshotItems = document.querySelectorAll('.snapshot-item');
+    const videoPopupOverlay = document.getElementById('videoPopupOverlay');
+    const videoPopupTitle = document.getElementById('videoPopupTitle');
+    const videoPopupClose = document.getElementById('videoPopupClose');
+    
+    snapshotItems.forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        snapshotItems.forEach((s) => s.classList.remove('active'));
+        item.classList.add('active');
+        const time = item.getAttribute('data-time') || '';
+        videoPopupTitle.textContent = time + ' 视频预览';
+        videoPopupOverlay.classList.add('show');
+      });
+    });
+    
+    videoPopupClose.addEventListener('click', () => {
+      videoPopupOverlay.classList.remove('show');
+    });
+    videoPopupOverlay.addEventListener('click', (e) => {
+      if (e.target === videoPopupOverlay) {
+        videoPopupOverlay.classList.remove('show');
+      }
+    });
+    
+    const sceneViewDetailBtn = document.getElementById('sceneViewDetailBtn');
+    if (sceneViewDetailBtn) {
+      sceneViewDetailBtn.addEventListener('click', () => {
+        window.location.href = 'scene.html';
+      });
+    }
+    
+    const dailyViewDetailBtn = document.getElementById('dailyViewDetailBtn');
+    if (dailyViewDetailBtn) {
+      dailyViewDetailBtn.addEventListener('click', goToDaily);
     }
     
     // 场景配置tab切换
@@ -1189,74 +1277,70 @@
       });
     });
     
-    // 自定义检查项输入框
-    const customItemInput = document.getElementById('customItemInput');
-    const addCustomBtn = customItemInput.nextElementSibling;
+    if (document.getElementById('customItemInput')) {
+      const customItemInput = document.getElementById('customItemInput');
+      const addCustomBtn = customItemInput.nextElementSibling;
 
-    function updateAddBtnState() {
-      const hasPurpleTag = document.querySelector('.tag.purple') !== null;
-      
-      if (hasPurpleTag) {
-        addCustomBtn.disabled = true;
-        return;
+      function updateAddBtnState() {
+        const hasPurpleTag = document.querySelector('.tag.purple') !== null;
+        
+        if (hasPurpleTag) {
+          addCustomBtn.disabled = true;
+          return;
+        }
+        
+        const value = customItemInput.value.trim();
+        if (!value || value.length > 5) {
+          addCustomBtn.disabled = true;
+        } else {
+          addCustomBtn.disabled = false;
+        }
       }
+
+      customItemInput.addEventListener('input', updateAddBtnState);
+      updateAddBtnState();
       
-      const value = customItemInput.value.trim();
-      if (!value || value.length > 5) {
-        addCustomBtn.disabled = true;
-      } else {
-        addCustomBtn.disabled = false;
-      }
-    }
+      addCustomBtn.addEventListener('click', () => {
+        const value = customItemInput.value.trim();
+        if (!value || value.length > 5) return;
 
-    customItemInput.addEventListener('input', updateAddBtnState);
-    updateAddBtnState(); // 初始化按钮状态
+        const tagList = document.querySelectorAll('.config-section .tag-list')[1];
+        if (!tagList) return;
+        const firstChar = value.charAt(0);
+        
+        const newTag = document.createElement('div');
+        newTag.className = 'tag purple';
+        newTag.innerHTML = `
+          <span class="icon">${firstChar}</span>
+          <span>${value}</span>
+          <span class="remove-tag" style="font-size:10px; cursor: pointer;">×</span>
+        `;
 
-    // 点击添加按钮创建新标签
-    addCustomBtn.addEventListener('click', () => {
-      const value = customItemInput.value.trim();
-      if (!value || value.length > 5) return;
+        newTag.querySelector('.remove-tag').addEventListener('click', (e) => {
+          e.stopPropagation();
+          newTag.remove();
+          updateAddBtnState();
+        });
 
-      const tagList = document.querySelectorAll('.config-section .tag-list')[1];
-      const firstChar = value.charAt(0);
-      
-      const newTag = document.createElement('div');
-      newTag.className = 'tag purple';
-      newTag.innerHTML = `
-        <span class="icon">${firstChar}</span>
-        <span>${value}</span>
-        <span class="remove-tag" style="font-size:10px; cursor: pointer;">×</span>
-      `;
-
-      // 添加删除事件
-      newTag.querySelector('.remove-tag').addEventListener('click', (e) => {
-        e.stopPropagation();
-        newTag.remove();
+        tagList.insertBefore(newTag, tagList.firstChild);
+        customItemInput.value = '';
         updateAddBtnState();
       });
 
-      // 插入到标签列表第一个位置
-      tagList.insertBefore(newTag, tagList.firstChild);
-      
-      // 清空输入框并更新按钮状态
-      customItemInput.value = '';
-      updateAddBtnState();
-    });
-
-    // 点击×删除标签
-    document.querySelectorAll('.remove-tag').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const tag = btn.closest('.tag');
-        if (tag) {
-          tag.remove();
-          updateAddBtnState(); // 删除标签后更新按钮状态
-        }
+      document.querySelectorAll('.remove-tag').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const tag = btn.closest('.tag');
+          if (tag) {
+            tag.remove();
+            updateAddBtnState();
+          }
+        });
       });
-    });
+    }
 
     // 添加摄像机弹窗交互
-    const addBtn = document.querySelector('.camera-item.add');
+    const addBtn = document.getElementById('addCameraBtn');
     const modal = document.getElementById('addCameraModal');
     const modalClose = document.getElementById('modalClose');
     const cancelBtn = document.getElementById('cancelBtn');
@@ -1285,11 +1369,20 @@
       modal.classList.remove('show');
     }
     
+    function updateAddBtnState() {
+      const cards = document.querySelectorAll('.hardware-card');
+      if (cards.length >= 3) {
+        addBtn.classList.add('disabled');
+      } else {
+        addBtn.classList.remove('disabled');
+      }
+    }
+    updateAddBtnState();
+    
     addBtn.addEventListener('click', openModal);
     modalClose.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
     
-    // 点击遮罩关闭弹窗
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         closeModal();
@@ -1338,13 +1431,67 @@
       e.preventDefault();
       e.stopPropagation();
       
-      // 如果按钮处于禁用状态，直接返回
       if (confirmBtn.classList.contains('disabled')) {
         return;
       }
       
-      // 当前不考虑输入正确的添加场景，直接显示错误提示
-      showErrorModal();
+      const snInputVal = document.querySelector('.sn-input').value.trim();
+      if (!snInputVal || snInputVal.length !== 22) {
+        showErrorModal();
+        return;
+      }
+      
+      const cardsContainer = document.querySelector('.hardware-card').parentNode;
+      const newIndex = document.querySelectorAll('.hardware-card').length + 1;
+      const newCard = document.createElement('div');
+      newCard.className = 'hardware-card';
+      newCard.setAttribute('data-camera', newIndex);
+      newCard.innerHTML = `
+        <div class="camera-icon"></div>
+        <div class="camera-info">
+          <div class="camera-name">新添加摄像机${newIndex}</div>
+          <div class="camera-id">SN: ${snInputVal}</div>
+          <div class="unbind-btn">解绑设备</div>
+        </div>
+        <div class="toggle-switch"></div>
+      `;
+      cardsContainer.insertBefore(newCard, document.querySelector('.hardware-card').nextSibling);
+      
+      const newToggle = newCard.querySelector('.toggle-switch');
+      newToggle.addEventListener('click', () => {
+        const allSwitches = document.querySelectorAll('.toggle-switch');
+        allSwitches.forEach((sw) => sw.classList.remove('on'));
+        newToggle.classList.add('on');
+      });
+      
+      const newUnbind = newCard.querySelector('.unbind-btn');
+      newUnbind.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        newCard.remove();
+        updateAddBtnState();
+        const remainingSwitches = document.querySelectorAll('.toggle-switch');
+        if (remainingSwitches.length > 0 && !document.querySelector('.toggle-switch.on')) {
+          remainingSwitches[0].classList.add('on');
+        }
+      });
+      
+      document.querySelector('.sn-input').value = '';
+      validateSNCode();
+      closeModal();
+      updateAddBtnState();
+    });
+    
+    document.querySelectorAll('.unbind-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.hardware-card');
+        card.remove();
+        updateAddBtnState();
+        const remainingSwitches = document.querySelectorAll('.toggle-switch');
+        if (remainingSwitches.length > 0 && !document.querySelector('.toggle-switch.on')) {
+          remainingSwitches[0].classList.add('on');
+        }
+      });
     });
   </script>
 </body>

@@ -13,50 +13,23 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #e0e5ec 0%, #c8d0e0 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
     }
     
-    .phone-container {
-      width: 375px;
-      height: 812px;
-      background: #000;
-      border-radius: 40px;
-      padding: 6px;
-      box-shadow: 
-        0 0 0 1px rgba(0,0,0,0.8),
-        0 20px 40px -10px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .phone-screen {
-      width: 100%;
-      height: 100%;
-      background: #f5f7fa;
-      border-radius: 34px;
+    .page-container {
+      width: 402px;
+      height: 874px;
+      background: #ffffff;
+      margin: 0 auto;
       overflow: hidden;
       position: relative;
-    }
-    
-    .phone-notch {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 160px;
-      height: 20px;
-      background: #000;
-      border-radius: 0 0 12px 12px;
-      z-index: 100;
     }
     
     .page-content {
-      height: calc(100% - 56px);
+      width: 100%;
+      height: 100%;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -301,14 +274,69 @@
     
     .dynamic-image {
       width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
-      border-radius: 8px;
+      height: 60px;
+      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      border-radius: 6px;
       flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .dynamic-image:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .dynamic-image::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 60%);
+    }
+    .dynamic-image .play-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 22px;
+      height: 22px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .dynamic-image .play-icon::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 5px 0 5px 8px;
+      border-color: transparent transparent transparent #1a73e8;
+      margin-left: 2px;
+    }
+    .dynamic-image .thumb-time {
+      position: absolute;
+      bottom: 3px;
+      right: 4px;
+      font-size: 9px;
+      color: #fff;
+      background: rgba(0,0,0,0.55);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: -apple-system, monospace;
+    }
+    .dynamic-image .video-no {
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      font-size: 8px;
+      color: #fff;
+      background: rgba(26,115,232,0.85);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: -apple-system, sans-serif;
     }
     
     .dynamic-actions {
@@ -321,23 +349,58 @@
     }
     
     .action-btn-sm {
-      padding: 6px 16px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 13px;
-      border: 1px solid #ddd;
-      background-color: #fff;
+      border: 1px solid #eee;
+      background-color: #fafafa;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, color 0.2s, border-color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .action-btn-sm .thumb-icon {
+      display: inline-block;
+      font-size: 16px;
+      line-height: 1;
     }
     
     .action-btn-sm:hover {
-      background-color: #f5f7fa;
+      background-color: #f0f0f0;
     }
     
-    .action-btn-sm.active {
-      background-color: #e3f2fd;
-      border-color: #1a73e8;
-      color: #1a73e8;
+    .action-btn-sm:active {
+      transform: scale(1.15);
+    }
+    
+    .action-btn-sm.like.active {
+      background-color: #fff3e0;
+      border-color: #ff9800;
+      color: #e65100;
+    }
+    .action-btn-sm.like.active .thumb-icon {
+      animation: popLike 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popLike {
+      0% { transform: scale(0.6); }
+      50% { transform: scale(1.4) rotate(-8deg); }
+      100% { transform: scale(1); }
+    }
+    
+    .action-btn-sm.dislike.active {
+      background-color: #fce4ec;
+      border-color: #e91e63;
+      color: #ad1457;
+    }
+    .action-btn-sm.dislike.active .thumb-icon {
+      animation: popDislike 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popDislike {
+      0% { transform: scale(0.6); }
+      50% { transform: scale(1.4) rotate(8deg); }
+      100% { transform: scale(1); }
     }
     
     /* 安全提示 */
@@ -400,10 +463,8 @@
   </style>
 </head>
 <body>
-  <div class="phone-container">
-    <div class="phone-screen">
-      <div class="phone-notch"></div>
-      <div class="page-content">
+  <div class="page-container">
+    <div class="page-content">
         <!-- 头部 -->
         <div class="header">
     <div class="back-btn" id="backBtn">←</div>
@@ -478,10 +539,15 @@
               <span class="tag tag-orange">客流超限</span>
             </div>
           </div>
+          <div class="dynamic-image" data-video="16:29">
+            <span class="video-no">3</span>
+            <span class="play-icon"></span>
+            <span class="thumb-time">16:29</span>
+          </div>
         </div>
         <div class="dynamic-actions">
-          <button class="action-btn-sm" id="accurate1">准确</button>
-          <button class="action-btn-sm" id="inaccurate1">不准确</button>
+          <button class="action-btn-sm like" id="accurate1"><span class="thumb-icon">👍</span>点赞</button>
+          <button class="action-btn-sm dislike" id="inaccurate1"><span class="thumb-icon">👎</span>倒赞</button>
         </div>
       </div>
       
@@ -498,11 +564,15 @@
               <span class="tag tag-orange">客流超限</span>
             </div>
           </div>
-          <div class="dynamic-image">📷</div>
+          <div class="dynamic-image" data-video="16:24">
+            <span class="video-no">2</span>
+            <span class="play-icon"></span>
+            <span class="thumb-time">16:24</span>
+          </div>
         </div>
         <div class="dynamic-actions">
-          <button class="action-btn-sm" id="accurate2">准确</button>
-          <button class="action-btn-sm" id="inaccurate2">不准确</button>
+          <button class="action-btn-sm like" id="accurate2"><span class="thumb-icon">👍</span>点赞</button>
+          <button class="action-btn-sm dislike" id="inaccurate2"><span class="thumb-icon">👎</span>倒赞</button>
         </div>
       </div>
       
@@ -520,11 +590,15 @@
               <span class="tag tag-orange">老鼠</span>
             </div>
           </div>
-          <div class="dynamic-image">📷</div>
+          <div class="dynamic-image" data-video="16:19">
+            <span class="video-no">1</span>
+            <span class="play-icon"></span>
+            <span class="thumb-time">16:19</span>
+          </div>
         </div>
         <div class="dynamic-actions">
-          <button class="action-btn-sm" id="accurate3">准确</button>
-          <button class="action-btn-sm" id="inaccurate3">不准确</button>
+          <button class="action-btn-sm like" id="accurate3"><span class="thumb-icon">👍</span>点赞</button>
+          <button class="action-btn-sm dislike" id="inaccurate3"><span class="thumb-icon">👎</span>倒赞</button>
         </div>
       </div>
     </div>
@@ -607,13 +681,31 @@
       document.getElementById('safetyList').style.display = 'block';
     });
     
-    // 准确/不准确按钮
-    document.querySelectorAll('.action-btn-sm').forEach(btn => {
-      btn.addEventListener('click', () => {
-        btn.classList.toggle('active');
-        const otherBtn = btn.parentNode.querySelector('.action-btn-sm:not(.active)');
-        if (otherBtn) otherBtn.classList.remove('active');
-        showToast(btn.textContent + '已标记');
+    // 点赞/倒赞按钮
+    document.querySelectorAll('.dynamic-actions').forEach(group => {
+      const likeBtn = group.querySelector('.action-btn-sm.like');
+      const dislikeBtn = group.querySelector('.action-btn-sm.dislike');
+      
+      likeBtn.addEventListener('click', () => {
+        dislikeBtn.classList.remove('active');
+        likeBtn.classList.toggle('active');
+        if (likeBtn.classList.contains('active')) {
+          likeBtn.style.animation = 'none';
+          void likeBtn.offsetWidth;
+          likeBtn.style.animation = '';
+          showToast('👍 点赞成功');
+        }
+      });
+      
+      dislikeBtn.addEventListener('click', () => {
+        likeBtn.classList.remove('active');
+        dislikeBtn.classList.toggle('active');
+        if (dislikeBtn.classList.contains('active')) {
+          dislikeBtn.style.animation = 'none';
+          void dislikeBtn.offsetWidth;
+          dislikeBtn.style.animation = '';
+          showToast('👎 已倒赞');
+        }
       });
     });
     
@@ -626,6 +718,54 @@
         toast.classList.remove('show');
       }, 2000);
     }
+    
+    // 视频缩略图点击弹窗
+    const videoModalOverlay = document.createElement('div');
+    videoModalOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.25s;';
+    videoModalOverlay.innerHTML = `
+      <div style="background:#1a1a1a;width:320px;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);transform:scale(0.9);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#222;color:#fff;">
+          <div style="font-size:14px;font-weight:600;" id="videoModalTitle">视频预览</div>
+          <div style="width:26px;height:26px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:#fff;" id="videoModalClose">×</div>
+        </div>
+        <div style="aspect-ratio:16/9;background:linear-gradient(135deg,#4a5568 0%,#2d3748 100%);position:relative;display:flex;align-items:center;justify-content:center;">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.4);cursor:pointer;" id="playBtn">
+            <div style="width:0;height:0;border-style:solid;border-width:8px 0 8px 12px;border-color:transparent transparent transparent #1a73e8;margin-left:3px;"></div>
+          </div>
+          <div style="position:absolute;bottom:10px;right:12px;color:rgba(255,255,255,0.7);font-size:11px;font-family:-apple-system,monospace;">00:00 / 01:30</div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(videoModalOverlay);
+    const videoModalBody = videoModalOverlay.querySelector('div');
+    
+    function openVideoModal(time) {
+      videoModalOverlay.querySelector('#videoModalTitle').textContent = time + ' 视频预览';
+      videoModalOverlay.style.opacity = '1';
+      videoModalOverlay.style.visibility = 'visible';
+      setTimeout(() => { videoModalBody.style.transform = 'scale(1)'; }, 10);
+    }
+    function closeVideoModal() {
+      videoModalBody.style.transform = 'scale(0.9)';
+      setTimeout(() => {
+        videoModalOverlay.style.opacity = '0';
+        videoModalOverlay.style.visibility = 'hidden';
+      }, 200);
+    }
+    
+    videoModalOverlay.addEventListener('click', (e) => {
+      if (e.target === videoModalOverlay) closeVideoModal();
+    });
+    videoModalOverlay.querySelector('#videoModalClose').addEventListener('click', closeVideoModal);
+    
+    document.querySelectorAll('.dynamic-image').forEach(thumb => {
+      thumb.style.cursor = 'pointer';
+      thumb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const t = thumb.getAttribute('data-video') || '实时';
+        openVideoModal(t);
+      });
+    });
   </script>
 </body>
 </html>
