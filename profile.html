@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>个人中心</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .page-container {
+      width: 402px;
+      height: 874px;
+      background: #f5f5f5;
+      margin: 0 auto;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .page-content {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+    }
+    
+    .top-bar {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      padding-top: 48px;
+      background: #1a73e8;
+    }
+    
+    .back-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+    }
+    
+    .page-title {
+      flex: 1;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .user-card {
+      background: #1a73e8;
+      padding: 24px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .user-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .user-avatar svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .user-info {
+      flex: 1;
+      color: #fff;
+    }
+    
+    .user-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .user-id {
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+    
+    .user-phone {
+      font-size: 12px;
+      opacity: 0.6;
+    }
+    
+    .menu-list {
+      background: #fff;
+      margin: 12px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+    
+    .menu-item:active {
+      background: #f8f8f8;
+    }
+    
+    .menu-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-right: 12px;
+    }
+    
+    .menu-text {
+      flex: 1;
+      font-size: 15px;
+      color: #333;
+    }
+    
+    .menu-arrow {
+      font-size: 16px;
+      color: #ccc;
+    }
+    
+    .menu-group {
+      margin-top: 12px;
+    }
+    
+    .menu-group-title {
+      padding: 0 16px;
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    
+    .logout-btn {
+      margin: 24px 12px;
+      padding: 14px;
+      background: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      color: #e53935;
+      cursor: pointer;
+      width: calc(100% - 24px);
+    }
+    
+    .logout-btn:active {
+      background: #f8f8f8;
+    }
+    
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: #fff;
+      width: 85%;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    
+    .modal-desc {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    
+    .modal-btn-group {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .modal-btn.cancel {
+      background: #f0f0f0;
+      color: #666;
+    }
+    
+    .modal-btn.confirm {
+      background: #1a73e8;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="page-content">
+      <div class="top-bar">
+        <a class="back-btn" href="index.html">‹</a>
+        <div class="page-title">个人中心</div>
+        <div style="width: 32px;"></div>
+      </div>
+      
+      <div class="user-card">
+        <div class="user-avatar">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="#f5f5f5"/>
+            <circle cx="50" cy="38" r="18" fill="#ddd"/>
+            <ellipse cx="50" cy="75" rx="22" ry="18" fill="#ddd"/>
+          </svg>
+        </div>
+        <div class="user-info">
+          <div class="user-name">智能巡检用户</div>
+          <div class="user-id">微信号：wx_xxxx1234</div>
+          <div class="user-phone">绑定手机：138****8888</div>
+        </div>
+      </div>
+      
+      <div class="menu-group">
+        <div class="menu-group-title">服务支持</div>
+        <div class="menu-list">
+          <div class="menu-item" id="helpCenter">
+            <div class="menu-icon">❓</div>
+            <div class="menu-text">帮助中心</div>
+            <div class="menu-arrow">›</div>
+          </div>
+          <div class="menu-item" id="feedback">
+            <div class="menu-icon">💬</div>
+            <div class="menu-text">意见反馈</div>
+            <div class="menu-arrow">›</div>
+          </div>
+          <div class="menu-item" id="contactUs">
+            <div class="menu-icon">💌</div>
+            <div class="menu-text">在线客服</div>
+            <div class="menu-arrow">›</div>
+          </div>
+          <div class="menu-item" id="about">
+            <div class="menu-icon">ℹ️</div>
+            <div class="menu-text">关于我们</div>
+            <div class="menu-arrow">›</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="menu-group">
+        <div class="menu-group-title">设置</div>
+        <div class="menu-list">
+          <div class="menu-item" id="accountSettings">
+            <div class="menu-icon">👤</div>
+            <div class="menu-text">账号与安全</div>
+            <div class="menu-arrow">›</div>
+          </div>
+          <div class="menu-item" id="notificationSettings">
+            <div class="menu-icon">🔔</div>
+            <div class="menu-text">通知设置</div>
+            <div class="menu-arrow">›</div>
+          </div>
+          <div class="menu-item" id="privacySettings">
+            <div class="menu-icon">🔒</div>
+            <div class="menu-text">隐私设置</div>
+            <div class="menu-arrow">›</div>
+          </div>
+        </div>
+      </div>
+      
+      <button class="logout-btn" id="logoutBtn">退出登录</button>
+    </div>
+    
+    <div class="modal-overlay" id="logoutModal">
+      <div class="modal-content">
+        <div class="modal-title">提示</div>
+        <div class="modal-desc">确定要退出登录吗？</div>
+        <div class="modal-btn-group">
+          <button class="modal-btn cancel" id="cancelLogout">取消</button>
+          <button class="modal-btn confirm" id="confirmLogout">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('helpCenter').addEventListener('click', () => {
+      alert('帮助中心功能开发中...');
+    });
+    
+    document.getElementById('feedback').addEventListener('click', () => {
+      alert('意见反馈功能开发中...');
+    });
+    
+    document.getElementById('contactUs').addEventListener('click', () => {
+      alert('在线客服功能开发中...');
+    });
+    
+    document.getElementById('about').addEventListener('click', () => {
+      alert('关于我们：\n智能巡检 v1.0.0\n专为安防巡检打造的智能监控解决方案');
+    });
+    
+    document.getElementById('accountSettings').addEventListener('click', () => {
+      alert('账号与安全设置开发中...');
+    });
+    
+    document.getElementById('notificationSettings').addEventListener('click', () => {
+      alert('通知设置功能开发中...');
+    });
+    
+    document.getElementById('privacySettings').addEventListener('click', () => {
+      alert('隐私设置功能开发中...');
+    });
+    
+    const logoutModal = document.getElementById('logoutModal');
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      logoutModal.classList.add('show');
+    });
+    
+    document.getElementById('cancelLogout').addEventListener('click', () => {
+      logoutModal.classList.remove('show');
+    });
+    
+    document.getElementById('confirmLogout').addEventListener('click', () => {
+      logoutModal.classList.remove('show');
+      alert('已退出登录');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

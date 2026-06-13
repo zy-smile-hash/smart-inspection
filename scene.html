@@ -43,7 +43,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
+      font-size: 28px;
+      font-weight: 600;
       color: #333;
       text-decoration: none;
     }
@@ -52,15 +53,8 @@
       font-weight: 600;
       color: #000;
     }
-    .top-bar .right-icons {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-    }
-    .top-bar .right-icons span {
-      font-size: 20px;
-      color: #333;
-      cursor: pointer;
+    .top-bar .right-icons-placeholder {
+      width: 60px;
     }
     
     .subtitle {
@@ -116,7 +110,6 @@
     .scene-icon.community { background: linear-gradient(135deg, #a8d5ff 0%, #6bb3ff 100%); }
     .scene-icon.water { background: linear-gradient(135deg, #a5e0ff 0%, #5ac1f5 100%); }
     .scene-icon.shop { background: linear-gradient(135deg, #ffd8a8 0%, #ffb566 100%); }
-    .scene-icon.device { background: linear-gradient(135deg, #d8d8d8 0%, #a8a8a8 100%); }
     
     .scene-info {
       flex: 1;
@@ -179,10 +172,13 @@
       margin-top: 12px;
       padding-top: 12px;
       border-top: 1px dashed #d5def0;
-      display: flex;
+      display: none;
       flex-wrap: wrap;
       gap: 8px;
       align-items: center;
+    }
+    .scene-card.active .scene-tags {
+      display: flex;
     }
     .tag-chip {
       display: inline-flex;
@@ -383,10 +379,7 @@
     <div class="top-bar">
       <a class="back-btn" href="index.html">‹</a>
       <div class="page-title">场景配置</div>
-      <div class="right-icons">
-        <span>⌖</span>
-        <span style="font-size:22px;">✕</span>
-      </div>
+      <div class="right-icons-placeholder"></div>
     </div>
     
     <div class="subtitle">根据摄像头所在场景，进行选择</div>
@@ -423,7 +416,18 @@
               <span class="scene-name">巡社区</span>
               <span class="new-tag"><span class="sparkle">✨</span>大模型</span>
             </div>
+            <div class="scene-sub">当前场景，支持检测以下目标</div>
           </div>
+          <div class="scene-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></svg>
+          </div>
+        </div>
+        <div class="scene-tags">
+          <span class="tag-chip"><span class="tag-dot">✓</span>火焰</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>烟雾</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>吸烟的人</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>垃圾</span>
+          <span class="tag-add" id="addCustomTagCommunity">＋ 自定义设置</span>
         </div>
       </div>
       
@@ -435,7 +439,18 @@
               <span class="scene-name">巡水域</span>
               <span class="new-tag"><span class="sparkle">✨</span>大模型</span>
             </div>
+            <div class="scene-sub">当前场景，支持检测以下目标</div>
           </div>
+          <div class="scene-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></svg>
+          </div>
+        </div>
+        <div class="scene-tags">
+          <span class="tag-chip"><span class="tag-dot">✓</span>人形</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>动物</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>漂浮物</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>垃圾</span>
+          <span class="tag-add" id="addCustomTagWater">＋ 自定义设置</span>
         </div>
       </div>
       
@@ -447,20 +462,21 @@
               <span class="scene-name">巡店铺</span>
               <span class="new-tag"><span class="sparkle">✨</span>大模型</span>
             </div>
+            <div class="scene-sub">当前场景，支持检测以下目标</div>
           </div>
+          <div class="scene-check">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></svg>
+          </div>
+        </div>
+        <div class="scene-tags">
+          <span class="tag-chip"><span class="tag-dot">✓</span>烟雾</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>垃圾</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>玩手机的人</span>
+          <span class="tag-chip"><span class="tag-dot">✓</span>吸烟的人</span>
+          <span class="tag-add" id="addCustomTagShop">＋ 自定义设置</span>
         </div>
       </div>
       
-      <div class="scene-card" data-scene="device">
-        <div class="scene-header">
-          <div class="scene-icon device">📹</div>
-          <div class="scene-info">
-            <div class="scene-name-row">
-              <span class="scene-name">设备异常</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
     
     <div class="confirm-bar">
@@ -517,13 +533,18 @@
     const tagInput = document.getElementById('tagInput');
     const tagConfirm = document.getElementById('tagPickerConfirm');
     
-    document.getElementById('addCustomTag').addEventListener('click', (e) => {
+    function openTagPicker(e) {
       e.stopPropagation();
       tagInput.value = '';
       tagConfirm.disabled = true;
       tagOverlay.classList.add('show');
       setTimeout(() => tagInput.focus(), 200);
-    });
+    }
+    
+    document.getElementById('addCustomTag').addEventListener('click', openTagPicker);
+    document.getElementById('addCustomTagCommunity').addEventListener('click', openTagPicker);
+    document.getElementById('addCustomTagWater').addEventListener('click', openTagPicker);
+    document.getElementById('addCustomTagShop').addEventListener('click', openTagPicker);
     document.getElementById('tagPickerCancel').addEventListener('click', () => {
       tagOverlay.classList.remove('show');
     });
